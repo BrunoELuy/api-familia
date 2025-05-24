@@ -1,6 +1,6 @@
-from flask import request, Response
+from flask import request, Response, jsonify
 import json
-from db import get_familia, get_familiar, post_update_familiar, post_new_familiar
+from db import get_familia, get_familiar, post_update_familiar, post_new_familiar, del_familiar, patch_familiar
 
 
 def registrar_rotas(app):
@@ -38,6 +38,15 @@ def registrar_rotas(app):
             json.dumps(resultado, ensure_ascii=False),
             content_type='application/json'
         )
+    
+    @app.route('/familia/<int:id>', methods=['DELETE'])
+    def deletar_familiar(id):
+        return jsonify(del_familiar(id))
+    
+    @app.route('/familia/<int:id>', methods=['PATCH'])
+    def atualizar_parcial_familiar(id):
+        dados = request.get_json()
+        return jsonify(patch_familiar(id, dados))
 
     @app.route('/familia/new', methods=['POST'])
     def new_familiar():
@@ -48,4 +57,3 @@ def registrar_rotas(app):
             json.dumps(resultado, ensure_ascii=False),
             content_type='application/json'
         )
-

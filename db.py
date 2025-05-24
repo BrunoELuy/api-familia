@@ -1,8 +1,10 @@
 import sqlite3
 from collections import OrderedDict
 
+
 def conectar():
     return sqlite3.connect("familia.db")
+
 
 def formatar_familia(dado):
     id, nome, idade, parentesco, hobbies, emprego = dado
@@ -15,7 +17,6 @@ def formatar_familia(dado):
         ("emprego", emprego)
     ])
 
-    
 
 def get_familia():
     with conectar() as con:
@@ -33,10 +34,11 @@ def get_familiar(id):
     with conectar() as con:
         cur = con.cursor()
         cur.execute(
-            "SELECT id, nome, idade, parentesco, hobbies, emprego FROM familiares WHERE id = ?", (id,)
+            "SELECT id, nome, idade, parentesco, hobbies, emprego FROM familiares WHERE id = ?", (
+                id,)
         )
         dado = cur.fetchone()
-        
+
         if dado:
             return formatar_familia(dado)
 
@@ -90,3 +92,47 @@ def post_new_familiar(dados):
 
         con.commit()
     return {"mensagem": "Familiar criado com sucesso!"}
+
+
+def del_familiar(id):
+    with conectar() as con:
+        cur = con.cursor()
+        cur.execute("""
+            DELETE FROM familiares WHERE id = ?
+                    """, (id,))
+        con.commit()
+        cur.close()
+        if cur.rowcount > 0:
+            return {"mensagem": f"Familiar com id == {id} deletado!"}
+        else:
+            return {"erro": "Familiar não encontrado"}, 404
+
+def patch_familiar(id, dados):
+    with conectar() as con:
+        cur = con.cursor()
+
+        campos = []
+        valores = []
+
+        for key in dados:
+            if key in ["nome", "idade", "parentesco", "hobbies", "emprego"]:
+                campos.append(f"{key} = ?")
+                valores.append(dados[key])
+
+        if not campos:
+            return {"erro": "Nenhum campo válido para atualizar"}, 400
+        
+        valores.append(id)
+        comando = f"UPDATE familiares SET {', '.join(campos)} WHERE id = ?"
+
+        cur.execute(comando, valores)
+        print(cur.execute(comando, valores))
+        con.commit()
+        cur.close()
+
+        if cur.rowcount > 0:
+            return {"mensagem": "Familiar atualizado com sucesso."}
+        else:
+            return {"erro": "Familiar não encontrado"}, 404
+        
+

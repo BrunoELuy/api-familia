@@ -1,9 +1,7 @@
 from flask import Flask
+from .rotas import registrar_rotas
 
 def create_app():
     app = Flask(__name__)
-
-    from .rotas import bp as rotas_bp
-    app.register_blueprint(rotas_bp)
-
+    registrar_rotas(app)
     return app

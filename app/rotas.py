@@ -1,6 +1,6 @@
 from flask import request, Response, jsonify
 import json
-from db import get_familia, get_familiar, post_update_familiar, post_new_familiar, del_familiar, patch_familiar
+from app.db import (get_familia, get_familiar, post_update_familiar, post_new_familiar, del_familiar, patch_familiar)
 
 
 def registrar_rotas(app):
